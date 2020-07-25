@@ -13,14 +13,24 @@ namespace CommerceTraining.Controllers
 {
     public class FashionNodeController : CatalogControllerBase<FashionNode>
     {
-        public FashionNodeController() 
-            : base()
+        public FashionNodeController(
+            IContentLoader contentLoader,
+            UrlResolver urlResolver,
+            AssetUrlResolver assetUrlResolver,
+            ThumbnailUrlResolver thumbnailUrlResolver) 
+            : base(contentLoader, urlResolver, assetUrlResolver, thumbnailUrlResolver)
         {
         }
 
         public ActionResult Index(FashionNode currentContent)
         {
-            return View(currentContent);
+            var model = new NodeEntryCombo
+            {
+                Nodes = GetNodes(currentContent.ContentLink),
+                Entries = GetEntries(currentContent.ContentLink)
+            };
+
+            return View(model);
         }
     }
 }
