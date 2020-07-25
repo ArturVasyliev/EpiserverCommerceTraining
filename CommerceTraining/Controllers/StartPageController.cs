@@ -29,7 +29,7 @@ namespace CommerceTraining.Controllers
             _urlResolver = urlResolver;
 
             // uncomment the below when the catalog is modelled
-            // topCategory = contentLoader.Get<StartPage>(ContentReference.StartPage).Settings.topCategory;
+            topCategory = contentLoader.Get<StartPage>(ContentReference.StartPage).Settings.TopCategory;
         }
 
         public string GetUrl(ContentReference contentReference)
@@ -45,7 +45,7 @@ namespace CommerceTraining.Controllers
                 myPageChildren = _contentLoader.GetChildren<IContent>(currentPage.ContentLink),
                 
                 // uncomment the below when the catalog is modelled
-                //topLevelCategories = _contentLoader.GetChildren<CatalogContentBase>(topCategory).OfType<NodeContent>(),
+                topLevelCategories = _contentLoader.GetChildren<CatalogContentBase>(topCategory).OfType<NodeContent>(),
             };
 
             return View(model);

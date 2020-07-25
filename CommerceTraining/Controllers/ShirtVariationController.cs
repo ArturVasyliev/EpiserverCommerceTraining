@@ -12,5 +12,10 @@ namespace CommerceTraining.Controllers
             : base()
         {
         }
+
+        public ActionResult Index(ShirtVariation currentContent)
+        {
+            return View(currentContent);
+        }
     }
 }
