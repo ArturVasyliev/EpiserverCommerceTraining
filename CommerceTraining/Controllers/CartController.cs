@@ -59,14 +59,47 @@ namespace CommerceTraining.Controllers
             _lineItemValidator = lineItemValidator;
             _placedPriceProcessor = placedPriceProcessor;
         }
+
         public ActionResult Index(CartPage currentPage)
         {
-            // ToDo: (lab D2)
+            // ToDo: (exercise D2)
+            var cart = _orderRepository.LoadCart<ICart>(
+                GetContactId()
+                , DefaultCartName);
 
+            // NOTE: a few different ways of loading cart
+            // var cart1 = _orderRepository.Load<ICart>(GetContactId(), DefaultCartName).FirstOrDefault();
+            // var cart2 = _orderRepository.LoadCart<ICart>(GetContactId(), DefaultCartName);
+            // var cart3 = _orderRepository.Load(); // all IOrderGroups for current user... 8 overloads
+
+            if (cart == null)
+            {
+                return View("NoCart"); // ...do this nicer
+            }
+            else
+            {
+                string warningMessages = ValidateCart(cart);
+
+                if (String.IsNullOrEmpty(warningMessages))
+                {
+                    warningMessages += "No messages";
+                }
+
+                var model = new CartViewModel
+                {
+                    LineItems = cart.GetAllLineItems(), // Extension method
+                    SubTotal = _orderGroupCalculator.GetSubTotal(cart),
+                    WarningMessage = warningMessages
+                };
+
+                _orderRepository.Save(cart);
+
+                return View("index", model);
+            }
 
 
             // The below is a dummy, remove when lab D2 is done
-            return null;
+            //return null;
         }
 
         public ActionResult Checkout()
