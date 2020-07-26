@@ -1,8 +1,20 @@
-﻿@model CommerceTraining.Models.Catalog.ShirtVariation
+﻿@using EPiServer.Core
+@using EPiServer.Web.Mvc.Html
+
+@model CommerceTraining.Models.ViewModels.ShirtVariationViewModel
 
 <div>
-    @Html.DisplayFor(m => m.ContentType)
+    Variant page
 </div>
+
 <div>
-    @Html.PropertyFor(m => m.Code)
+    <img src="@Model.image">
+</div>
+
+<div>
+    <strong>Default Price: </strong> @Html.DisplayFor(m => m.priceString)
+</div>
+
+<div>
+    @Html.CheckBoxFor(m => m.CanBeMonogrammed) Can have a monogram
 </div>
