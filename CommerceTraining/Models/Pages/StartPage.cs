@@ -22,7 +22,7 @@ namespace CommerceTraining.Models.Pages
             Order = 1)]
         public virtual XhtmlString MainBody { get; set; }
 
-	[Display(GroupName = SystemTabNames.Settings)]
+	    [Display(GroupName = SystemTabNames.Settings)]
         public virtual SettingsBlock Settings { get; set; }
 
         public virtual ContentReference campaignLink { get; set; }
