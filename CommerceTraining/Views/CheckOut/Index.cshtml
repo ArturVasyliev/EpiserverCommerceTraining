@@ -1,12 +1,18 @@
-﻿    @using EPiServer.Core
+﻿@using EPiServer.Core
 @using EPiServer.Web.Mvc.Html
 
 @model CommerceTraining.Models.Pages.CheckOutViewModel
 
 <div>
     Shipping rates
-
-
+    <ul>
+        @foreach (var item in Model.ShippingRates)
+        {
+            <li>
+                @item.Name - @item.Money.Amount - (@item.Money.Currency)
+            </li>
+        }
+    </ul>
 </div>
 
 
@@ -14,9 +20,8 @@
     Make your choices
     @using (@Html.BeginForm("CheckOut", "Checkout", FormMethod.Post))
     {
-        @*@Html.DropDownListFor(m => m.SelectedShipId, new SelectList(Model.ShippingMethods, "ShippingMethodId", "DisplayName"))
-            @Html.DropDownListFor(m => m.SelectedPayId, new SelectList(Model.PaymentMethods, "PaymentMethodId", "Name"))*@
+        @Html.DropDownListFor(m => m.SelectedShipId, new SelectList(Model.ShippingMethods, "ShippingMethodId", "DisplayName"))
+        @Html.DropDownListFor(m => m.SelectedPayId, new SelectList(Model.PaymentMethods, "PaymentMethodId", "Name"))
 
-        <button type="submit">Check out</button>
-    }
+        <button type="submit">Check out</button>}
 </div>
