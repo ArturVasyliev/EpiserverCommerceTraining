@@ -10,5 +10,8 @@ namespace CommerceTraining.Models.ViewModels
         public string url { get; set; }
         public bool CanBeMonogrammed { get; set; }
         public XhtmlString MainBody { get; set; }
+
+        public string discountString { get; set; }
+        public decimal discountPrice { get; set; }
     }
 }

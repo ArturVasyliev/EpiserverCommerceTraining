@@ -85,8 +85,12 @@ namespace CommerceTraining.Controllers
                     warningMessages += "No messages";
                 }
 
+                _promotionEngine.Run(cart);
+                Money totalDiscount = _orderGroupCalculator.GetOrderDiscountTotal(cart);
+
                 var model = new CartViewModel
                 {
+                    PromotionRewards = GetPromotionRewards(cart),
                     LineItems = cart.GetAllLineItems(), // Extension method
                     SubTotal = _orderGroupCalculator.GetSubTotal(cart),
                     WarningMessage = warningMessages
@@ -127,6 +131,12 @@ namespace CommerceTraining.Controllers
                 validationMessages += CreateValidationMessages(item, issue), _inventoryProcessor);
 
             return validationMessages; // now this one also works
+        }
+
+        private string GetPromotionRewards(ICart cart)
+        {
+            var rewardDescriptions = _promotionEngine.Run(cart).ToList();
+            return string.Join(";", rewardDescriptions);
         }
 
         private static string CreateValidationMessages(ILineItem item, ValidationIssue issue)

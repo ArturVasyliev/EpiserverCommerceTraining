@@ -15,10 +15,25 @@
     <strong>Default Price: </strong> @Html.DisplayFor(m => m.priceString)
 </div>
 
+@* wait with this one *@
+
+<div>
+    @Model.discountString
+</div>
+<div>
+    <strong>Discount Price: </strong> @Html.DisplayFor(m => m.discountPrice)
+</div>
+
 <div>
     @Html.CheckBoxFor(m => m.CanBeMonogrammed) Can have a monogram
 </div>
 
+@*NOT IN FUND-Exercise*@
+@*<div>
+    @Html.PropertyFor(m => m.ProductArea)
+</div>*@
+
+@* Have other name on SKU in lab *@
 <div>
     @using (Html.BeginForm("AddToCart", "ShirtVariation"))
     {
