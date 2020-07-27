@@ -59,16 +59,66 @@ namespace CommerceTraining.Controllers
             return RedirectToAction("Index", new { page = ContentReference.StartPage }.page.ToPageReference());
         }
 
-        // ToDo: Exercises in customers module
         public ActionResult CreateAccount(AccountPage currentPage, string userName, string passWord)
         {
+            // The important here are the Roles and the Contact properties 
+            string firstName = userName;
+            string lastName = userName;
+            string emailAddress = firstName + "." + lastName + "@epi.com"; // 
+            string password = passWord;
 
+            //CustomerContext.Current.CurrentContact.
+
+            MembershipUser membershipGuy = null;
+
+            MembershipCreateStatus createStatus;
+            membershipGuy = Membership.CreateUser(emailAddress, password, emailAddress,
+                                         null, null, true, out createStatus);
+            //CustomerContext.Current.
+            // Create the Contact in ECF 
+            CustomerContact customerContact = CustomerContact.CreateInstance(membershipGuy);
+            customerContact.FirstName = firstName;
+            customerContact.LastName = lastName;
+            customerContact.RegistrationSource = String.Format("{0}, {1}"
+                , this.Request.Url.Host, SiteContext.Current);
+
+            //customerContact["Email"] = emailAddress; // can do...
+            customerContact.Email = emailAddress;
+
+            // Do the "SaveChanges()" before setting ECF-"Roles" 
+            customerContact.SaveChanges();
+
+            // These Roles are ECF specific ... Used by CM ... and obsolete in 9
+            //SecurityContext.Current.AssignUserToGlobalRole(membershipGuy, AppRoles.EveryoneRole); 
+            //SecurityContext.Current.AssignUserToGlobalRole(membershipGuy, AppRoles.RegisteredRole); 
+
+            // We don't need this anymore for visitors/customers
+            Roles.AddUserToRole(membershipGuy.UserName, AppRoles.EveryoneRole);
+            Roles.AddUserToRole(membershipGuy.UserName, AppRoles.RegisteredRole); // could mean "ClubMember"
+            // Could have other use of it...
+            // Roles.AddUserToRole(membershipGuy.UserName, "ClubMember");
+
+            // Call for further properties to be set
+            SetContactProperties(customerContact);
+
+            //CustomerContext.Current.CurrentContact.e
             return null; // for now
         }
 
         protected void SetContactProperties(CustomerContact contact)
         {
-  
+            Organization org = Organization.CreateInstance();
+            org.Name = "ParentOrg";
+            org.SaveChanges();
+
+            // Remember the EffectiveCustomerGroup!
+            contact.CustomerGroup = "MyBuddies";
+
+            // The custom field
+            contact["Geography"] = "West";
+            contact.OwnerId = org.PrimaryKeyId;
+
+            contact.SaveChanges();
         }
 
         public static void CreateAuthenticationCookie(HttpContextBase httpContext, string username, string domain, bool remember)
