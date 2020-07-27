@@ -10,56 +10,55 @@
     <b>Type specific:</b>
 </div>
 
-@*<div>
-        FashionNodes:
-        <ul>
-            @foreach (var item in Model.nodes)
-            {
-                <li>
-                    @Html.ContentLink(item.ContentLink)
-                </li>
-            }
-        </ul>
+<div>
+    FashionNodes:
+    <ul>
+        @foreach (var item in Model.nodes)
+        {
+            <li>
+                @Html.ContentLink(item.ContentLink)
+            </li>
+        }
+    </ul>
 
-    </div>
+</div>
+
+<div>
+    ShirtProducts:
+    <ul>
+        @foreach (var item in Model.products)
+        {
+            <li>
+                @Html.ContentLink(item.ContentLink)
+            </li>            
+        }
+    </ul>
+</div>
+
+<div>
+    ShirtVariants:
+    <ul>
+        @foreach (var item in Model.variants)
+        {
+            <li>
+                @Html.ContentLink(item.ContentLink)
+            </li>
+        }
+    </ul>
 
     <div>
-        ShirtProducts:
-        <ul>
-            @foreach (var item in Model.products)
-            {
-                <li>
-                    @Html.ContentLink(item.ContentLink)
-                </li>
-            }
-        </ul>
-
+        <b>Generic (IContent)</b>
     </div>
+    <ul>
+        @foreach (var item in Model.allContent)
+        {
+            <li>
+                @Html.ContentLink(item.ContentLink)
+            </li>            
+        }
+    </ul>
 
     <div>
-        ShirtVariations:
-        <ul>
-            @foreach (var item in Model.variants)
-            {
-                <li>
-                    @Html.ContentLink(item.ContentLink)
-                </li>
-            }
-        </ul>
-
-        <div>
-            <b>Generic (IContent)</b>
-        </div>
-        <ul>
-            @foreach (var item in Model.allContent)
-            {
-                <li>
-                    @Html.ContentLink(item.ContentLink)
-                </li>
-            }
-        </ul>
-
-     <div>
         <b>Facets</b>
     </div>
     <div>
@@ -72,5 +71,4 @@
             }
         </ul>
     </div>
-
-    </div>*@
+</div>

@@ -17,6 +17,8 @@ using Mediachase.Commerce.Catalog.Managers;
 using System;
 using EPiServer.ServiceLocation;
 using EPiServer.Web.Routing;
+using CommerceTraining.Models.Catalog;
+using EPiServer.Globalization;
 
 namespace CommerceTraining.Controllers
 {
@@ -27,7 +29,10 @@ namespace CommerceTraining.Controllers
         public readonly ReferenceConverter _referenceConverter;
         public readonly UrlResolver _urlResolver;
 
-        public SearchController(IContentLoader contentLoader, ReferenceConverter referenceConverter, UrlResolver urlResolver)
+        public SearchController(
+            IContentLoader contentLoader,
+            ReferenceConverter referenceConverter,
+            UrlResolver urlResolver)
         {
             _contentLoader = contentLoader;
             _referenceConverter = referenceConverter;
@@ -47,24 +52,74 @@ namespace CommerceTraining.Controllers
         public ActionResult Search(string keyWord)
         {
             // ToDo: SearchHelper and Criteria 
+            SearchFilterHelper searchHelper = SearchFilterHelper.Current; // the easy way
 
+            CatalogEntrySearchCriteria criteria = searchHelper.CreateSearchCriteria(keyWord
+                , CatalogEntrySearchCriteria.DefaultSortOrder);
+
+            criteria.RecordsToRetrieve = 25;
+            criteria.StartingRecord = 0;
+            //criteria.Locale = "en"; // needed
+            criteria.Locale = ContentLanguage.PreferredCulture.Name;
+
+            
 
             // ToDo: Search 
+            // One way of "doing it" ... retrieve it like ISearchResults (preferred, most certainly)
+            ISearchResults searchResult = searchHelper.SearchEntries(criteria);
+            ISearchDocument aDoc = searchResult.Documents.FirstOrDefault();
+            int[] ints = searchResult.GetKeyFieldValues<int>();
 
+            /* == ways of loading, keeping some old stuff for enjoying squiggles == */
+            // ECF style Entries, old-school & legacy, not recommended at all... 
+            // ...work with DTOs if not using the ContentModel
+            //Entries entries = CatalogContext.Current.GetCatalogEntries(ints, // Note "ints"
+            //    new CatalogEntryResponseGroup(CatalogEntryResponseGroup.ResponseGroup.CatalogEntryInfo));
+
+            // still interesting
+            CatalogContext.Current.GetCatalogEntriesDto(ints
+                , new CatalogEntryResponseGroup(CatalogEntryResponseGroup.ResponseGroup.CatalogEntryInfo));
+
+            // Same thing... ECF-old-style, not recommended... if not absolutely needed...
+            // Use the helper and get the entries direct 
+            // If entries are needed ... like for calculating discounts with legacy StoreHelper()
+            //int count = 0; // "Out"
+            //bool cacheResult = true;
+            //TimeSpan timeSpan = new TimeSpan(0, 10, 0);
+            //Entries entriesDirect = searchHelper.SearchEntries(criteria, out count // Note the different return-types ... akward!
+            //    , new CatalogEntryResponseGroup(CatalogEntryResponseGroup.ResponseGroup.CatalogEntryInfo)
+            //    , cacheResult, timeSpan);
+
+            // CMS style (better)... using ReferenceConverter and ContentLoader 
+            List<ContentReference> refs = new List<ContentReference>();
+            ints.ToList().ForEach(i => refs.Add(_referenceConverter.GetContentLink(i, CatalogContentType.CatalogEntry, 0)));
+
+            // LoaderOptions() is new in CMS 8
+            // ILanguageSelector selector = ServiceLocator.Current.GetInstance<ILanguageSelector>(); // obsolete
+            localContent = _contentLoader.GetItems(refs, new LoaderOptions()); // use this in CMS 8+
 
             // ToDo: Facets
+            List<string> facetList = new List<string>();
 
+            int facetGroups = searchResult.FacetGroups.Count();
 
-            // ToDo: As a last step - un-comment and fill up the ViewModel
+            foreach (ISearchFacetGroup item in searchResult.FacetGroups)
+            {
+                foreach (var item2 in item.Facets)
+                {
+                    facetList.Add(String.Format("{0} {1} ({2})", item.Name, item2.Name, item2.Count));
+                }
+            }
+
+            // Fill up the ViewModel
             var searchResultViewModel = new SearchResultViewModel();
-            /*
+
             searchResultViewModel.totalHits = new List<string> { "" }; // change
             searchResultViewModel.nodes = localContent.OfType<FashionNode>();
             searchResultViewModel.products = localContent.OfType<ShirtProduct>();
             searchResultViewModel.variants = localContent.OfType<ShirtVariation>();
             searchResultViewModel.allContent = localContent;
             searchResultViewModel.facets = facetList;
-            */
 
             return View(searchResultViewModel);
         }
